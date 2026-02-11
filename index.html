@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Story Time Adventures</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&amp;family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      transition: background-color 0.4s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-15px) rotate(3deg); }
+      75% { transform: translateY(-8px) rotate(-2deg); }
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 183, 77, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(255, 183, 77, 0.6); }
+    }
+
+    @keyframes sound-pulse {
+      0% { transform: scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: scale(1.3) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes toast-slide {
+      from { opacity: 0; transform: translate(-50%, 20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    
+    .floating { animation: float 4s ease-in-out infinite; }
+    .floating-delay-1 { animation: float 4.5s ease-in-out infinite 0.5s; }
+    .floating-delay-2 { animation: float 5s ease-in-out infinite 1s; }
+    .twinkle { animation: twinkle 2s ease-in-out infinite; }
+    .bounce-gentle { animation: bounce-gentle 2s ease-in-out infinite; }
+    .slide-up { animation: slide-up 0.6s ease-out forwards; }
+    .fade-in { animation: fade-in 0.5s ease-out forwards; }
+    .wiggle { animation: wiggle 0.5s ease-in-out; }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .story-card {
+      transform: perspective(1000px) rotateX(0deg);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .story-card:hover {
+      transform: perspective(1000px) rotateX(-5deg) translateY(-10px) scale(1.02);
+    }
+    
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease-out;
+    }
+    
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .theme-toggle-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .theme-toggle-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+    
+    .theme-toggle-btn:hover::after {
+      transform: translateX(100%);
+    }
+    
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    
+    .story-paragraph {
+      line-height: 1.9;
+      text-indent: 2em;
+    }
+    
+    .story-paragraph:first-of-type::first-letter {
+      font-size: 3.5em;
+      float: left;
+      line-height: 0.8;
+      margin-right: 0.1em;
+      margin-top: 0.1em;
+      font-weight: 700;
+    }
+    
+    .moral-box {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .moral-box::before {
+      content: '✨';
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 1.5em;
+      animation: twinkle 1.5s ease-in-out infinite;
+    }
+    
+    .moral-box::after {
+      content: '✨';
+      position: absolute;
+      bottom: 10px;
+      right: 15px;
+      font-size: 1.5em;
+      animation: twinkle 1.5s ease-in-out infinite 0.5s;
+    }
+
+    .nav-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+    }
+
+    .nav-btn:hover::before {
+      width: 200%;
+      height: 200%;
+    }
+
+    .sound-button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5em;
+      transition: all 0.3s ease;
+      border: 2px solid currentColor;
+    }
+
+    .sound-button:hover {
+      transform: scale(1.1);
+    }
+
+    .sound-button:active {
+      transform: scale(0.95);
+    }
+
+    .sound-pulse-ring {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      animation: sound-pulse 0.6s ease-out;
+    }
+
+    .sound-effects-container {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 20px);
+      z-index: 50;
+      padding: 12px 24px;
+      border-radius: 50px;
+      opacity: 0;
+      pointer-events: none;
+      animation: toast-slide 0.3s ease-out forwards;
+      font-weight: 600;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.1em;
+    }
+
+    .toast.show {
+      animation: toast-slide 0.3s ease-out forwards;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full">
+  <div id="app-wrapper" class="h-full overflow-auto"><!-- Toast notification -->
+   <div id="toast" class="toast"></div><!-- Home Page -->
+   <div id="home-page" class="min-h-full relative"><!-- Floating Decorations -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+     <div class="floating absolute text-5xl" style="top: 8%; left: 5%;">
+      ⭐
+     </div>
+     <div class="floating-delay-1 absolute text-4xl" style="top: 15%; right: 10%;">
+      🌙
+     </div>
+     <div class="floating-delay-2 absolute text-5xl" style="top: 60%; left: 8%;">
+      🦋
+     </div>
+     <div class="floating absolute text-4xl" style="top: 70%; right: 5%;">
+      🌈
+     </div>
+     <div class="twinkle sparkle" style="top: 25%; left: 20%; background: #FFD700;"></div>
+     <div class="twinkle sparkle" style="top: 40%; right: 25%; background: #FF69B4; animation-delay: 0.3s;"></div>
+     <div class="twinkle sparkle" style="top: 55%; left: 30%; background: #87CEEB; animation-delay: 0.6s;"></div>
+     <div class="twinkle sparkle" style="top: 75%; right: 15%; background: #98FB98; animation-delay: 0.9s;"></div>
+    </div><!-- Header -->
+    <header class="relative z-10 pt-8 pb-6 px-4">
+     <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3"><span class="text-5xl bounce-gentle">📚</span>
+       <h1 id="main-title" class="text-3xl md:text-4xl font-bold" style="font-family: 'Baloo 2', cursive;"></h1>
+      </div><button id="theme-toggle" class="theme-toggle-btn px-5 py-3 rounded-full font-semibold shadow-lg flex items-center gap-2" style="font-family: 'Quicksand', sans-serif;"> <span id="theme-icon">🌙</span> <span id="theme-text" class="hidden sm:inline">Night Mode</span> </button>
+     </div>
+    </header><!-- Welcome Section -->
+    <section class="relative z-10 text-center py-8 px-4">
+     <p id="welcome-text" class="text-xl md:text-2xl font-medium" style="font-family: 'Quicksand', sans-serif;"></p>
+     <div class="flex justify-center gap-4 mt-4 text-3xl"><span class="floating">🏰</span> <span class="floating-delay-1">🐉</span> <span class="floating-delay-2">👸</span> <span class="floating">🧙‍♂️</span>
+     </div>
+    </section><!-- Story Grid -->
+    <section class="relative z-10 px-4 pb-12">
+     <div id="story-grid" class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Stories will be inserted here -->
+     </div>
+    </section><!-- Footer -->
+    <footer class="relative z-10 text-center py-8 px-4">
+     <p class="text-lg" style="font-family: 'Quicksand', sans-serif;">Made with 💖 for young readers everywhere</p>
+     <div class="flex justify-center gap-2 mt-3 text-2xl"><span>📖</span><span>✨</span><span>🌟</span>
+     </div>
+    </footer>
+   </div><!-- Story Page -->
+   <div id="story-page" class="min-h-full relative hidden"><!-- Floating Decorations for Story -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+     <div class="floating absolute text-4xl" style="top: 10%; right: 5%;">
+      ✨
+     </div>
+     <div class="floating-delay-1 absolute text-3xl" style="top: 30%; left: 3%;">
+      🌸
+     </div>
+     <div class="floating-delay-2 absolute text-4xl" style="top: 50%; right: 3%;">
+      🦄
+     </div>
+    </div><!-- Story Header -->
+    <header class="relative z-10 pt-8 pb-4 px-4">
+     <div class="max-w-3xl mx-auto"><button id="back-btn" class="nav-btn px-6 py-3 rounded-full font-semibold shadow-lg flex items-center gap-2 mb-6" style="font-family: 'Quicksand', sans-serif;"> <span>←</span> <span>Back to Stories</span> </button>
+      <div id="story-header" class="text-center"><span id="story-emoji" class="text-7xl block mb-4 bounce-gentle"></span>
+       <h1 id="story-title" class="text-3xl md:text-4xl font-bold mb-3" style="font-family: 'Baloo 2', cursive;"></h1>
+       <p id="story-origin" class="text-lg font-medium" style="font-family: 'Quicksand', sans-serif;"></p>
+      </div>
+     </div>
+    </header><!-- Story Content -->
+    <main class="relative z-10 px-4 py-8">
+     <div class="max-w-3xl mx-auto"><!-- Sound Effects Section -->
+      <div class="sound-effects-container" id="sound-effects-container"><!-- Sound buttons will be inserted here -->
+      </div>
+      <article id="story-content" class="rounded-3xl p-6 md:p-10 shadow-xl" style="font-family: 'Quicksand', sans-serif;"><!-- Story paragraphs will be inserted here -->
+      </article><!-- Moral Box -->
+      <div id="moral-section" class="mt-10 scroll-reveal">
+       <div class="moral-box rounded-3xl p-8 text-center shadow-xl pulse-glow">
+        <h3 id="moral-heading" class="text-2xl font-bold mb-4" style="font-family: 'Baloo 2', cursive;"></h3>
+        <p id="moral-text" class="text-xl font-medium leading-relaxed" style="font-family: 'Quicksand', sans-serif;"></p>
+       </div>
+      </div><!-- Story Navigation -->
+      <div class="flex justify-between items-center mt-10 gap-4"><button id="prev-story" class="nav-btn flex-1 py-4 rounded-2xl font-semibold shadow-lg flex items-center justify-center gap-2" style="font-family: 'Quicksand', sans-serif;"> <span>←</span> <span class="hidden sm:inline">Previous</span> </button> <button id="home-btn" class="nav-btn px-8 py-4 rounded-2xl font-semibold shadow-lg flex items-center justify-center gap-2" style="font-family: 'Quicksand', sans-serif;"> <span>🏠</span> <span class="hidden sm:inline">Home</span> </button> <button id="next-story" class="nav-btn flex-1 py-4 rounded-2xl font-semibold shadow-lg flex items-center justify-center gap-2" style="font-family: 'Quicksand', sans-serif;"> <span class="hidden sm:inline">Next</span> <span>→</span> </button>
+      </div>
+     </div>
+    </main>
+   </div>
+  </div>
+  <script>
+    // Stories Data with Sound Effects
+    const stories = [
+      {
+        id: 1,
+        title: "The Tortoise and the Hare",
+        emoji: "🐢",
+        origin: "Aesop's Fables",
+        color: "#4CAF50",
+        soundEffects: ["🏃 Whoosh!", "💤 Snore...", "🏆 Victory!"],
+        content: [
+          "Once upon a time, in a sunny meadow, there lived a speedy Hare who loved to boast about how fast he could run. He would zoom past all the other animals, laughing at how slow they were.",
+          "One day, the Hare spotted a Tortoise slowly making his way across the field. \"You're so slow!\" the Hare teased. \"I bet you couldn't beat me in a race if you tried for a hundred years!\"",
+          "The Tortoise looked up calmly and said, \"I accept your challenge. Let's race to the big oak tree on the hill.\"",
+          "All the forest animals gathered to watch. When the race began, the Hare dashed off like lightning while the Tortoise took one careful step at a time.",
+          "The Hare was so far ahead that he decided to take a little nap under a shady tree. \"I have plenty of time,\" he yawned. Meanwhile, the Tortoise kept walking, never stopping, never rushing.",
+          "When the Hare finally woke up, he saw something amazing – the Tortoise was almost at the finish line! The Hare ran as fast as he could, but it was too late. The Tortoise had won!"
+        ],
+        moral: "Slow and steady wins the race. Hard work and perseverance are more valuable than natural talent wasted."
+      },
+      {
+        id: 2,
+        title: "The Lion and the Mouse",
+        emoji: "🦁",
+        origin: "Aesop's Fables",
+        color: "#FF9800",
+        soundEffects: ["🦁 ROAR!", "🐭 Squeak!", "🤝 Thank You!"],
+        content: [
+          "Deep in the golden savanna, a mighty Lion lay sleeping under his favorite baobab tree. His great mane spread around him like a crown of gold.",
+          "A tiny Mouse, not looking where she was going, scurried right across the Lion's nose! The Lion woke up with a ROAR and trapped the Mouse under his enormous paw.",
+          "\"Please, great King of Beasts!\" squeaked the Mouse. \"Let me go, and someday I will help you!\" The Lion laughed so hard that tears rolled down his face. \"You? Help ME? That's the funniest thing I've ever heard!\"",
+          "But the Lion was in a good mood, so he lifted his paw and let the tiny Mouse go free.",
+          "Many days later, the Lion became trapped in a hunter's net. He roared and struggled, but he couldn't escape. His mighty roars echoed across the savanna.",
+          "The little Mouse heard the roars and came running. With her sharp teeth, she gnawed through the ropes one by one until the great Lion was free!",
+          "\"Thank you, little friend,\" said the Lion humbly. \"You were right – even the smallest friend can be the biggest help.\""
+        ],
+        moral: "No act of kindness, no matter how small, is ever wasted. Everyone has value, regardless of their size."
+      },
+      {
+        id: 3,
+        title: "The Ugly Duckling",
+        emoji: "🦢",
+        origin: "Hans Christian Andersen",
+        color: "#2196F3",
+        soundEffects: ["🐣 Crack!", "😢 Sad Quack", "✨ Magical!"],
+        content: [
+          "On a beautiful farm beside a sparkling pond, Mother Duck sat on her nest waiting for her eggs to hatch. Pop! Pop! Pop! One by one, fluffy yellow ducklings emerged.",
+          "But the last egg was bigger than the others. When it finally cracked open, out tumbled a duckling who looked... different. He was gray and gangly with big awkward feet.",
+          "\"What a strange-looking duckling!\" quacked the other ducks. The farm animals weren't kind either. The chickens pecked at him, and the geese honked meanly.",
+          "Feeling sad and lonely, the little duckling ran away. Through summer, autumn, and cold winter, he wandered alone, always feeling like he didn't belong.",
+          "When spring arrived, the duckling found a pond with the most beautiful birds he had ever seen – elegant white swans with graceful necks.",
+          "\"They'll chase me away too,\" he thought sadly, bowing his head. But when he looked down at his reflection in the water, he gasped! He wasn't an ugly duckling anymore – he had become a magnificent swan!",
+          "The other swans swam over to greet him. \"Welcome, beautiful one!\" they said. And from that day on, the once-lonely duckling lived happily as the most beautiful swan of all."
+        ],
+        moral: "Don't judge yourself or others by appearances. True beauty comes from within, and everyone finds where they belong."
+      },
+      {
+        id: 4,
+        title: "The Boy Who Cried Wolf",
+        emoji: "🐺",
+        origin: "Aesop's Fables",
+        color: "#9C27B0",
+        soundEffects: ["📢 WOLF!", "👥 Running!", "🚨 Too Late!"],
+        content: [
+          "On a green hillside near a peaceful village, a young shepherd boy watched over a flock of fluffy sheep. Day after day, he sat alone with only the sheep for company.",
+          "One day, feeling bored and mischievous, the boy had an idea. \"WOLF! WOLF!\" he shouted at the top of his lungs. \"A wolf is attacking the sheep!\"",
+          "The villagers dropped everything and ran up the hill to help. But when they arrived, huffing and puffing, they found no wolf – just the boy laughing at his trick.",
+          "A few days later, the boy did it again. \"WOLF! WOLF!\" Once more, the kind villagers rushed to help, and once more, they found it was just a trick.",
+          "Then one evening, as the sun was setting, a real wolf crept out of the dark forest. Its yellow eyes gleamed as it stalked toward the sheep.",
+          "\"WOLF! WOLF!\" screamed the boy in terror. \"Please, this time it's REAL!\" But down in the village, the people shook their heads. \"That boy and his tricks,\" they said, and no one came.",
+          "The wolf scattered the flock, and the boy learned a very hard lesson that night."
+        ],
+        moral: "Always tell the truth. If you lie too many times, people won't believe you even when you're telling the truth."
+      },
+      {
+        id: 5,
+        title: "Goldilocks and the Three Bears",
+        emoji: "🐻",
+        origin: "English Fairy Tale",
+        color: "#795548",
+        soundEffects: ["🥣 Slurp!", "🪑 Crunch!", "🏃 Run Away!"],
+        content: [
+          "In a cozy cottage in the woods lived three bears: great big Papa Bear, medium-sized Mama Bear, and teeny tiny Baby Bear. One morning, they made porridge for breakfast.",
+          "\"It's too hot!\" said Papa Bear. So they decided to take a walk in the forest while their porridge cooled down.",
+          "While they were gone, a curious girl named Goldilocks wandered by and peeked through the window. \"Ooh, porridge!\" she said, walking right inside without asking.",
+          "She tasted Papa Bear's porridge – \"Too hot!\" She tried Mama Bear's – \"Too cold!\" Then Baby Bear's – \"Mmm, just right!\" And she ate it all up!",
+          "Goldilocks tried the chairs too. Papa's was too hard, Mama's was too soft, but Baby Bear's was just right – until CRACK! It broke!",
+          "Upstairs, she tried the beds. Papa's was too firm, Mama's was too squishy, but Baby Bear's was just right. She fell fast asleep!",
+          "When the bears came home, they found their cottage in chaos. They climbed the stairs and found Goldilocks! She woke up, saw three bears staring at her, and ran home as fast as she could, never to enter someone's house uninvited again!"
+        ],
+        moral: "Always respect others' property and privacy. Don't take what isn't yours, and always ask permission."
+      },
+      {
+        id: 6,
+        title: "The Little Red Hen",
+        emoji: "🐔",
+        origin: "English Folktale",
+        color: "#F44336",
+        soundEffects: ["👷 Working!", "🍞 Fresh Bread!", "😋 Yummy!"],
+        content: [
+          "On a cheerful little farm lived a Little Red Hen with her friends: a lazy Dog, a sleepy Cat, and a noisy Duck. One day, the Hen found some grains of wheat.",
+          "\"Who will help me plant this wheat?\" asked the Little Red Hen. \"Not I,\" barked the Dog. \"Not I,\" meowed the Cat. \"Not I,\" quacked the Duck. \"Then I'll do it myself,\" said the Hen. And she did.",
+          "The wheat grew tall and golden. \"Who will help me cut the wheat?\" asked the Hen. \"Not I,\" said her friends. So she cut it herself.",
+          "\"Who will help me take the wheat to the mill?\" asked the Hen. \"Not I,\" they all said. So the Little Red Hen carried it to the mill and came back with fine flour.",
+          "\"Who will help me bake the bread?\" she asked. \"Not I! Not I! Not I!\" So she mixed and kneaded and baked all by herself.",
+          "When the delicious bread came out of the oven, its wonderful smell filled the farm. \"Who will help me EAT this bread?\" asked the Hen.",
+          "\"I will!\" \"I will!\" \"I will!\" cried the Dog, Cat, and Duck. But the Little Red Hen shook her head. \"No,\" she said. \"I planted it, I harvested it, I milled it, and I baked it. Now I'll eat it – all by myself!\" And she did, every last crumb."
+        ],
+        moral: "If you want to enjoy the rewards, you must be willing to do the work. Don't expect to share in something you didn't help create."
+      },
+      {
+        id: 7,
+        title: "Cinderella",
+        emoji: "👑",
+        origin: "Charles Perrault",
+        color: "#E91E63",
+        soundEffects: ["✨ Bibbidi-Bobbidi-Boo!", "🎵 Dance!", "🚗 Midnight!"],
+        content: [
+          "Once there lived a kind and gentle girl named Cinderella whose mother had passed away. Her father remarried a cold woman with two mean daughters who treated Cinderella like a servant.",
+          "Every day, Cinderella scrubbed floors, cooked meals, and did all the household chores while her stepsisters sat about doing nothing but complaining.",
+          "One day, an invitation arrived from the royal palace. The Prince was hosting a grand ball and every eligible young maiden in the kingdom was invited!",
+          "Cinderella's stepsisters squealed with delight. \"We'll have the most beautiful gowns!\" they cried. But when Cinderella asked if she could go too, they laughed cruelly. \"You? In your rags? Never!\"",
+          "As her stepsisters left for the ball, Cinderella sat by the fire in tears. Suddenly, there was a shimmer of light, and her Fairy Godmother appeared!",
+          "\"Don't cry, dear child,\" said the Fairy Godmother. With a wave of her wand, Cinderella's rags transformed into a shimmering ball gown, her feet were fitted with glass slippers, and a pumpkin became a magnificent carriage.",
+          "\"But remember,\" warned the Fairy Godmother, \"the magic ends at midnight. When the clock strikes twelve, everything will return to normal.\"",
+          "At the ball, the Prince couldn't take his eyes off the mysterious, beautiful maiden. He danced with her all evening. Just as midnight approached, Cinderella remembered the warning and fled.",
+          "In her haste, one glass slipper fell. The Prince picked it up and vowed to find the girl whose foot fit the slipper.",
+          "When he came to Cinderella's home, the slipper fit her perfectly. The Prince had found his true love, and Cinderella lived happily ever after in the palace."
+        ],
+        moral: "Kindness and goodness shine through, no matter how others treat you. True beauty comes from a pure heart."
+      },
+      {
+        id: 8,
+        title: "Jack and the Beanstalk",
+        emoji: "🌱",
+        origin: "English Folktale",
+        color: "#388E3C",
+        soundEffects: ["🎵 Fee Fi Fo Fum!", "☁️ Up Up!", "💰 Gold!"],
+        content: [
+          "Long ago, a poor boy named Jack lived with his mother. When they couldn't afford food anymore, his mother asked him to take their only cow to market to sell.",
+          "On the way, Jack met a strange old man who offered him five magic beans in exchange for the cow. Jack was so excited about the beans that he agreed to the trade.",
+          "When Jack showed his mother the beans, she was furious. \"You traded our only cow for beans?!\" she cried and threw them out the window.",
+          "The next morning, Jack woke to find an enormous beanstalk growing outside his window, climbing so high it disappeared into the clouds!",
+          "Jack climbed the beanstalk and found himself in a land above the clouds. There stood a giant's castle! Jack snuck inside and found rooms filled with gold and treasures.",
+          "Jack grabbed a bag of gold coins and raced back down the beanstalk. His mother was amazed! They lived comfortably for a while, but soon the gold ran out.",
+          "Jack climbed the beanstalk again and found a magical hen that laid golden eggs. But as he was leaving, the giant spotted him! \"Fee Fi Fo Fum!\" roared the giant.",
+          "Jack climbed down as fast as he could while the giant followed. When Jack reached the bottom, he took an axe and chopped down the beanstalk. The giant came tumbling down with a crash!",
+          "Jack and his mother were now rich beyond their dreams, thanks to the hen's golden eggs. They never had to worry about poverty again."
+        ],
+        moral: "Bravery and quick thinking can help you overcome challenges. Sometimes taking risks leads to great rewards."
+      },
+      {
+        id: 9,
+        title: "The Three Little Pigs",
+        emoji: "🐷",
+        origin: "English Folktale",
+        color: "#FF6F00",
+        soundEffects: ["🏗️ Building!", "🐺 Who's There?", "🔥 Brick House!"],
+        content: [
+          "Once upon a time, three little pigs left their mother's home to seek their fortunes. \"Build sturdy houses,\" their mother advised, \"and always be careful of the wolf!\"",
+          "The first pig encountered a bundle of straw. \"Perfect!\" he thought and built a house in just a day. Soon he was settled inside playing music.",
+          "The second pig found some wood. \"Even better,\" he thought and built a cozy wooden house, finishing it in two days. Both pigs visited each other to celebrate.",
+          "The third pig worked hard gathering bricks and stone. He built slowly but carefully, mixing mortar and placing each brick with care. It took him all week, but his house was strong and solid.",
+          "One evening, a hungry wolf appeared at the first pig's door. \"Little pig, little pig, let me in!\" growled the wolf. \"Not by the hair on my chinny chin chin!\" squeaked the pig.",
+          "The wolf huffed and puffed and blew the straw house down in seconds! The terrified pig ran to his brother's wooden house.",
+          "The wolf followed and demanded entry at the wooden house. After huffing and puffing, he blew that house down too! Both pigs ran to their brother's brick house.",
+          "When the wolf tried to blow down the brick house, he huffed and puffed until he was exhausted, but the house wouldn't budge. The three pigs were safe inside!",
+          "The wolf eventually gave up and left. The three pigs learned that hard work and preparation keep you safe, and they lived happily in the sturdy brick house together."
+        ],
+        moral: "Hard work and patience are worth the effort. Taking time to do things right is better than rushing."
+      },
+      {
+        id: 10,
+        title: "Rapunzel",
+        emoji: "💇‍♀️",
+        origin: "Brothers Grimm",
+        color: "#00BCD4",
+        soundEffects: ["✨ Magic Hair!", "🗼 Tower!", "💕 Love!"],
+        content: [
+          "A young girl named Rapunzel was locked away in a tall tower with no doors or stairs. She had been kept there since she was a baby by a witch who wanted to keep her hair – the most beautiful, magical hair anyone had ever seen.",
+          "Rapunzel's hair was so long that it reached all the way to the ground. The witch would climb up Rapunzel's hair to visit her in the tower.",
+          "Rapunzel spent her days painting, singing, and playing her guitar. Though she was lonely, she didn't know what life outside the tower was like.",
+          "One day, a prince who was riding through the forest heard the most beautiful voice singing. He followed the sound and found the tower, though he could see no way inside.",
+          "The prince called out to Rapunzel, who was so surprised to see another person that she let down her long hair for him to climb. They talked for hours, and both felt a spark of love.",
+          "The prince began visiting Rapunzel every evening. They became closer and fell deeply in love. Rapunzel wanted nothing more than to escape the tower and be with him.",
+          "One day, the witch discovered the prince's visits. Angry and jealous, she cut off all of Rapunzel's long, magical hair and sent her away to live alone in the forest.",
+          "When the prince arrived that evening, he was trapped by the witch's magic and thrown from the tower. He landed in thorny bushes that scratched his eyes, making him blind.",
+          "Blind and heartbroken, the prince wandered the forest for years. One day, he heard a familiar beautiful voice singing in the wilderness. He followed it and found Rapunzel!",
+          "Rapunzel's tears of joy fell on the prince's eyes, and miraculously, his sight was restored! They were reunited and eventually escaped to safety, where they lived happily together forever."
+        ],
+        moral: "Love and hope can overcome any hardship. True love finds a way, no matter the obstacles."
+      },
+      {
+        id: 11,
+        title: "Hansel and Gretel",
+        emoji: "🏠",
+        origin: "Brothers Grimm",
+        color: "#6A4C93",
+        soundEffects: ["🪜 Stones!", "🍪 Candy House!", "🔥 Clever!"],
+        content: [
+          "Once upon a time, two children named Hansel and Gretel lived with their poor woodcutter father and cruel stepmother. Their stepmother was mean and wanted to get rid of them.",
+          "One night, she forced their father to take them into the forest and leave them there. But clever Hansel had overheard the plan and filled his pockets with shiny white pebbles.",
+          "As they walked into the forest, Hansel secretly dropped the pebbles along the path. When it grew dark, Hansel pointed out the pebbles shimmering in the moonlight, and they followed the trail home!",
+          "Their stepmother was furious that they returned. She locked Hansel in a room and made the children do chores. This time, Hansel used breadcrumbs instead of pebbles.",
+          "But the forest birds ate the breadcrumbs, and the children got lost. They wandered for days until they came upon a magical cottage made entirely of gingerbread, candy, and frosting!",
+          "The hungry children eagerly began eating the delicious house. Suddenly, the door opened, and out came an old woman – a wicked witch!",
+          "The witch trapped Hansel in a cage to fatten him up and forced Gretel to do all the housework. The witch's eyesight was very poor.",
+          "One day, the witch asked Hansel to hold out his finger so she could feel if he was getting fat. Clever Hansel held out a chicken bone instead. The witch felt it and was confused why he wasn't getting fatter!",
+          "Gretel devised a plan. When the witch asked her to check if the oven was hot enough, Gretel suggested the witch check first. When the witch bent down, brave Gretel pushed her in and locked the door!",
+          "Hansel and Gretel discovered the witch's cottage was filled with pearls and precious gems. They filled their pockets and ran through the forest, eventually finding their way back home."
+        ],
+        moral: "Cleverness and bravery can save you from danger. Family love gives you strength to overcome challenges."
+      },
+      {
+        id: 12,
+        title: "Peter Pan",
+        emoji: "🧚",
+        origin: "J.M. Barrie",
+        color: "#00C853",
+        soundEffects: ["✨ Never Growing Up!", "⚔️ Adventure!", "🏝️ Neverland!"],
+        content: [
+          "In a magical place called Neverland, there lived a boy who never grew up – Peter Pan. He could fly, and he had magical powers that allowed him to stay young forever.",
+          "Peter Pan would visit the homes of sleeping children and take them on extraordinary adventures. One night, he visited the nursery of the Darling children: Wendy, John, and Michael.",
+          "\"Come with me to Neverland!\" said Peter Pan. \"It's a place where you never have to grow up and every day is an adventure!\" The children were enchanted and agreed to follow him.",
+          "Peter taught them to fly, and they soared through the night sky, leaving the city lights behind. Soon they arrived at Neverland, an island surrounded by mysterious shores and hidden treasures.",
+          "In Neverland, there were Lost Boys who had followed Peter, Native Americans, and dangerous pirates led by the villainous Captain Hook.",
+          "Captain Hook was Peter's enemy and was always trying to capture him. Peter and the Lost Boys had many thrilling adventures, battling the pirates and exploring hidden caves.",
+          "The Darling children had wonderful experiences – they met mermaids, fought pirates, and flew through magical forests. But Wendy began to notice something sad about Peter.",
+          "Though Wendy grew to care for Peter deeply, he remained unchanged. He would never age, never truly grow up, and could never fully understand the love and care that grew as people matured.",
+          "Eventually, Wendy realized that while Neverland was magical, true life meant growing and changing. She decided to return home with her brothers, even though it meant leaving Peter behind.",
+          "Peter Pan remained in Neverland forever, forever young but forever unable to truly belong anywhere. Yet he was content in his eternal adventures."
+        ],
+        moral: "Growing up is a precious journey, even though it means leaving childhood behind. There's beauty in change and in forming lasting bonds with others."
+      }
+    ];
+
+    // Default Configuration
+    const defaultConfig = {
+      site_title: "Story Time Adventures",
+      welcome_message: "Choose a magical story to begin your adventure! ✨",
+      moral_heading: "✨ The Moral of the Story ✨",
+      background_color: "#FFF8E7",
+      surface_color: "#FFFFFF",
+      text_color: "#4A3728",
+      primary_action_color: "#FF6B6B",
+      secondary_action_color: "#4ECDC4",
+      font_family: "Baloo 2",
+      font_size: 16,
+      is_dark_mode: false
+    };
+
+    let config = { ...defaultConfig };
+    let currentStoryIndex = 0;
+    let currentView = 'home';
+
+    // Theme colors
+    const lightTheme = {
+      background: "#FFF8E7",
+      surface: "#FFFFFF",
+      text: "#4A3728",
+      primary: "#FF6B6B",
+      secondary: "#4ECDC4"
+    };
+
+    const darkTheme = {
+      background: "#1A1A2E",
+      surface: "#16213E",
+      text: "#EAEAEA",
+      primary: "#FF6B6B",
+      secondary: "#4ECDC4"
+    };
+
+    // Show toast notification
+    function showToast(message, bgColor) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.backgroundColor = bgColor || '#FF6B6B';
+      toast.style.color = '#FFFFFF';
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // Create sound effect buttons with animation
+    function createSoundButtons(soundEffects, storyColor) {
+      const container = document.getElementById('sound-effects-container');
+      container.innerHTML = '';
+      
+      soundEffects.forEach((effect, index) => {
+        const button = document.createElement('button');
+        button.className = 'sound-button';
+        button.style.color = storyColor;
+        
+        // Extract emoji and text
+        const parts = effect.split(' ');
+        const emoji = parts[0];
+        const text = parts.slice(1).join(' ');
+        
+        button.innerHTML = `${emoji}`;
+        button.title = text;
+        
+        button.addEventListener('click', () => {
+          // Create pulse effect
+          const pulse = document.createElement('div');
+          pulse.className = 'sound-pulse-ring';
+          pulse.style.color = storyColor;
+          button.appendChild(pulse);
+          
+          setTimeout(() => pulse.remove(), 600);
+          
+          // Show toast
+          showToast(effect, storyColor);
+          
+          // Add slight bounce animation
+          button.style.animation = 'none';
+          setTimeout(() => {
+            button.style.animation = 'bounce-gentle 0.4s ease-out';
+          }, 10);
+        });
+        
+        container.appendChild(button);
+      });
+    }
+
+    // Apply theme based on config
+    function applyTheme() {
+      const theme = config.is_dark_mode ? darkTheme : lightTheme;
+      const wrapper = document.getElementById('app-wrapper');
+      const homePage = document.getElementById('home-page');
+      const storyPage = document.getElementById('story-page');
+      
+      // Apply background
+      wrapper.style.backgroundColor = theme.background;
+      homePage.style.backgroundColor = theme.background;
+      storyPage.style.backgroundColor = theme.background;
+      
+      // Apply text colors
+      document.getElementById('main-title').style.color = theme.text;
+      document.getElementById('welcome-text').style.color = theme.text;
+      
+      // Theme toggle button
+      const themeToggle = document.getElementById('theme-toggle');
+      themeToggle.style.backgroundColor = theme.primary;
+      themeToggle.style.color = '#FFFFFF';
+      document.getElementById('theme-icon').textContent = config.is_dark_mode ? '☀️' : '🌙';
+      document.getElementById('theme-text').textContent = config.is_dark_mode ? 'Day Mode' : 'Night Mode';
+      
+      // Back button
+      const backBtn = document.getElementById('back-btn');
+      backBtn.style.backgroundColor = theme.secondary;
+      backBtn.style.color = '#FFFFFF';
+      
+      // Navigation buttons
+      const navBtns = [document.getElementById('prev-story'), document.getElementById('home-btn'), document.getElementById('next-story')];
+      navBtns.forEach(btn => {
+        btn.style.backgroundColor = theme.primary;
+        btn.style.color = '#FFFFFF';
+      });
+      
+      // Story content area
+      const storyContent = document.getElementById('story-content');
+      if (storyContent) {
+        storyContent.style.backgroundColor = theme.surface;
+        storyContent.style.color = theme.text;
+      }
+      
+      // Moral section
+      const moralSection = document.querySelector('.moral-box');
+      if (moralSection) {
+        moralSection.style.backgroundColor = theme.surface;
+        moralSection.style.color = theme.text;
+      }
+      
+      // Story title and origin
+      document.getElementById('story-title').style.color = theme.text;
+      document.getElementById('story-origin').style.color = theme.secondary;
+      
+      // Update story cards
+      renderStoryGrid();
+    }
+
+    // Render story grid
+    function renderStoryGrid() {
+      const grid = document.getElementById('story-grid');
+      const theme = config.is_dark_mode ? darkTheme : lightTheme;
+      
+      grid.innerHTML = stories.map((story, index) => `
+        <div class="story-card rounded-3xl p-6 cursor-pointer shadow-xl scroll-reveal" 
+             data-story-index="${index}"
+             style="background: ${theme.surface}; animation-delay: ${index * 0.1}s;">
+          <div class="text-6xl text-center mb-4">${story.emoji}</div>
+          <h3 class="text-xl font-bold text-center mb-2" style="font-family: 'Baloo 2', cursive; color: ${story.color};">
+            ${story.title}
+          </h3>
+          <p class="text-center text-sm font-medium" style="color: ${theme.text}; opacity: 0.7;">
+            ${story.origin}
+          </p>
+          <div class="mt-4 py-2 px-4 rounded-full text-center text-sm font-semibold"
+               style="background: ${story.color}20; color: ${story.color};">
+            Read Story →
+          </div>
+        </div>
+      `).join('');
+      
+      // Add click handlers
+      grid.querySelectorAll('.story-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const index = parseInt(card.dataset.storyIndex);
+          openStory(index);
+        });
+      });
+      
+      // Trigger scroll reveal
+      setTimeout(() => {
+        grid.querySelectorAll('.scroll-reveal').forEach(el => {
+          el.classList.add('revealed');
+        });
+      }, 100);
+    }
+
+    // Open story page
+    function openStory(index) {
+      currentStoryIndex = index;
+      const story = stories[index];
+      const theme = config.is_dark_mode ? darkTheme : lightTheme;
+      
+      document.getElementById('story-emoji').textContent = story.emoji;
+      document.getElementById('story-title').textContent = story.title;
+      document.getElementById('story-title').style.color = story.color;
+      document.getElementById('story-origin').textContent = story.origin;
+      
+      // Create sound effect buttons
+      createSoundButtons(story.soundEffects, story.color);
+      
+      const contentEl = document.getElementById('story-content');
+      contentEl.innerHTML = story.content.map((para, i) => `
+        <p class="story-paragraph mb-6 text-lg scroll-reveal" style="animation-delay: ${i * 0.15}s;">
+          ${para}
+        </p>
+      `).join('');
+      contentEl.style.backgroundColor = theme.surface;
+      contentEl.style.color = theme.text;
+      
+      document.getElementById('moral-heading').textContent = config.moral_heading;
+      document.getElementById('moral-text').textContent = story.moral;
+      
+      const moralBox = document.querySelector('.moral-box');
+      moralBox.style.backgroundColor = story.color + '20';
+      moralBox.style.borderColor = story.color;
+      document.getElementById('moral-heading').style.color = story.color;
+      document.getElementById('moral-text').style.color = theme.text;
+      
+      // Show story page
+      document.getElementById('home-page').classList.add('hidden');
+      document.getElementById('story-page').classList.remove('hidden');
+      currentView = 'story';
+      
+      // Scroll to top
+      document.getElementById('app-wrapper').scrollTop = 0;
+      
+      // Trigger animations
+      setTimeout(() => {
+        contentEl.querySelectorAll('.scroll-reveal').forEach(el => {
+          el.classList.add('revealed');
+        });
+        document.getElementById('moral-section').classList.add('revealed');
+      }, 300);
+    }
+
+    // Go home
+    function goHome() {
+      document.getElementById('story-page').classList.add('hidden');
+      document.getElementById('home-page').classList.remove('hidden');
+      currentView = 'home';
+      document.getElementById('app-wrapper').scrollTop = 0;
+    }
+
+    // Navigate stories
+    function prevStory() {
+      const newIndex = currentStoryIndex > 0 ? currentStoryIndex - 1 : stories.length - 1;
+      openStory(newIndex);
+    }
+
+    function nextStory() {
+      const newIndex = currentStoryIndex < stories.length - 1 ? currentStoryIndex + 1 : 0;
+      openStory(newIndex);
+    }
+
+    // Config change handler
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      // Update text content
+      document.getElementById('main-title').textContent = config.site_title;
+      document.getElementById('welcome-text').textContent = config.welcome_message;
+      document.getElementById('moral-heading').textContent = config.moral_heading;
+      
+      // Apply fonts
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      document.getElementById('main-title').style.fontFamily = `${fontFamily}, cursive`;
+      
+      // Apply font size scaling
+      const baseSize = config.font_size || defaultConfig.font_size;
+      document.querySelectorAll('.story-paragraph').forEach(p => {
+        p.style.fontSize = `${baseSize * 1.125}px`;
+      });
+      
+      // Apply theme
+      applyTheme();
+    }
+
+    // Map to capabilities
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => { config.surface_color = value; window.elementSdk.setConfig({ surface_color: value }); }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => { config.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => { config.primary_action_color = value; window.elementSdk.setConfig({ primary_action_color: value }); }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => { config.secondary_action_color = value; window.elementSdk.setConfig({ secondary_action_color: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => { config.font_family = value; window.elementSdk.setConfig({ font_family: value }); }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => { config.font_size = value; window.elementSdk.setConfig({ font_size: value }); }
+        }
+      };
+    }
+
+    // Map to edit panel values
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["site_title", config.site_title || defaultConfig.site_title],
+        ["welcome_message", config.welcome_message || defaultConfig.welcome_message],
+        ["moral_heading", config.moral_heading || defaultConfig.moral_heading]
+      ]);
+    }
+
+    // Event listeners
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      config.is_dark_mode = !config.is_dark_mode;
+      if (window.elementSdk) {
+        window.elementSdk.setConfig({ is_dark_mode: config.is_dark_mode });
+      }
+      applyTheme();
+    });
+
+    document.getElementById('back-btn').addEventListener('click', goHome);
+    document.getElementById('home-btn').addEventListener('click', goHome);
+    document.getElementById('prev-story').addEventListener('click', prevStory);
+    document.getElementById('next-story').addEventListener('click', nextStory);
+
+    // Initialize
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    } else {
+      onConfigChange(defaultConfig);
+    }
+  </script>
+</body>
+</html>
